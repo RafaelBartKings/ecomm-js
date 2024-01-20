@@ -19,7 +19,7 @@ router.post('/cart/products', async (req, res) => {
     cart = await cartsRepo.getOne(req.session.cartId);
   }
 
-  const existingItem = cart.items.find(item => item.id === req.body.productId);
+  const existingItem = cart.items.find((item) => item.id === req.body.productId);
   if (existingItem) {
     // increment quantity and save cart
     existingItem.quantity++;
@@ -31,7 +31,7 @@ router.post('/cart/products', async (req, res) => {
     items: cart.items
   });
 
-  res.send('Product added to a cart');
+  res.redirect('/cart');
 })
 
 // Receive a GET request to show all items in cart
@@ -49,9 +49,16 @@ router.get('/cart', async (req, res) => {
 
   res.send(cartShowTemplate({ items: cart.items }))
 });
+
 // Receive 
+router.post('/cart/products/delete', async (req, res) => {
+  const { itemId } = req.body;
+  const cart = await cartsRepo.getOne(req.session.cartId);
+  const items = cart.items = cart.items.filter(item => item.id !== itemId);
+  await cartsRepo.update(req.session.cartId, { items });
 
-
+  res.redirect('/cart');
+});
 
 module.exports = router;
 
